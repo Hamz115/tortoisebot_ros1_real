@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  tortoisebot-ros1-real:
+    image: hamz115/hamzaferoze-cp22:ros1-real
+    container_name: tortoisebot-ros1-real
+    privileged: true
+    network_mode: "host"
+    volumes:
+      - /dev/mem:/dev/mem
+      - /dev/vchiq:/dev/vchiq
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev/dri:/dev/dri
+      - $HOME/.Xauthority:/root/.Xauthority
+    environment:
+      - DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - ROS_MASTER_URI=http://${ROS_IP}:11311
+      - ROS_HOSTNAME=${ROS_IP}
+      - ROS_IP=${ROS_IP}
+      - CAMERA_INFO_URL=package://tortoisebot/raspicam_node/camera_info/camerav1_1280x720.yaml
+    restart: unless-stopped
+
+  tortoisebot-ros1-slam-real:
+    image: hamz115/hamzaferoze-cp22:ros1-slam-real
+    container_name: tortoisebot-ros1-slam-real
+    privileged: true
+    network_mode: "host"
+    depends_on:
+      - tortoisebot-ros1-real
+    volumes:
+      - /dev/mem:/dev/mem
+      - /dev/vchiq:/dev/vchiq
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/dri:/dev/dri
+      - $HOME/.Xauthority:/root/.Xauthority
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - ROS_MASTER_URI=http://${ROS_IP}:11311
+      - ROS_HOSTNAME=${ROS_IP}
+      - ROS_IP=${ROS_IP}
+      - CAMERA_INFO_URL=package://tortoisebot/raspicam_node/camera_info/camerav1_1280x720.yaml
+    restart: unless-stopped
+  
